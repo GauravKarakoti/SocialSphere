@@ -2,7 +2,7 @@
 *Seamless SocialFi on NERO Chain*  
 
 ## Live Demo  
-https://socialsphere.xyz  
+social-sphere-theta.vercel.app
 
 ## Setup  
 1. Clone repo:  

@@ -1,56 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Client, UserOperationBuilder } from 'userop'; 
-import { formatUnits } from 'ethers'; // Import specific utilities
+import { formatUnits } from 'ethers'; 
 
 function useGasTracker() {
   const [gasSavings, setGasSavings] = useState({ total: 0, txCount: 0 });
   const [client, setClient] = useState(null);
   const [builder, setBuilder] = useState(null);
 
+  // initialize client/builder once
   useEffect(() => {
-    const initClient = async () => {
-      try {
-        const client = await Client.init('https://rpc-testnet.nerochain.io');
-        const builder = new UserOperationBuilder();
-        
-        // Configure Paymaster options
-        builder.setPaymasterOptions({
+    Client.init('https://rpc-testnet.nerochain.io')
+      .then(c => {
+        const b = new UserOperationBuilder();
+        b.setPaymasterOptions({
           rpc: 'https://paymaster-testnet.nerochain.io',
           apikey: process.env.API_KEY,
           type: 'erc20',
           token: 'SPHERE'
         });
-
-        setClient(client);
-        setBuilder(builder);
-      } catch (error) {
-        console.error('Error initializing gas tracker:', error);
-      }
-    };
-
-    initClient();
+        setClient(c);
+        setBuilder(b);
+      })
+      .catch(console.error);
   }, []);
 
-  const updateGasSavings = async () => {
+  // memoize updateGasSavings so ESLint can track its deps
+  const updateGasSavings = useCallback(async () => {
     if (!client || !builder) return;
 
     try {
-      // Get current gas estimates
-      const supportedTokens = await client.getSupportedTokens(builder);
       const gasData = await client.buildUserOperation(builder);
-      
-      // Calculate savings based on Paymaster rules
       const totalSaved = gasData.maxFeePerGas.mul(gasData.preVerificationGas);
       const txCount = await client.provider.getTransactionCount(gasData.sender);
 
       setGasSavings({
-        total: formatUnits(totalSaved, 18), // Use directly imported formatUnits
-        txCount: txCount
+        total: formatUnits(totalSaved, 18),
+        txCount
       });
     } catch (error) {
       console.error('Error updating gas savings:', error);
     }
-  };
+  }, [client, builder]);  // <- list all variables used inside  
 
   return { gasSavings, updateGasSavings };
 }
@@ -59,16 +49,15 @@ export default function GasDashboard() {
   const { gasSavings, updateGasSavings } = useGasTracker();
   const [remainingTxs, setRemainingTxs] = useState(10);
 
+  // include updateGasSavings in deps
   useEffect(() => {
     updateGasSavings();
     const interval = setInterval(updateGasSavings, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [updateGasSavings]);  // <- ESLint satisfied :contentReference[oaicite:0]{index=0}
 
   useEffect(() => {
-    if (gasSavings.txCount >= 0) {
-      setRemainingTxs(10 - gasSavings.txCount);
-    }
+    setRemainingTxs(10 - gasSavings.txCount);
   }, [gasSavings.txCount]);
 
   return (
