@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4f46e5;       
+  --primary-hover: #4338ca; 
+  --background: #f8fafc;    
+}
+
+/* Custom Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+}
+
+/* Custom components */
+@layer components {
+  .dashboard-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9; 
+  }
+  
+  .primary-btn {
+    background-color: var(--primary);
+    color: #ffffff; 
+    padding: 0.5rem 1rem; 
+    border-radius: 0.5rem; 
+    transition: background-color 0.2s ease-in-out; 
+  }
+  
+  .primary-btn:hover {
+    background-color: var(--primary-hover);
+  }  
+}

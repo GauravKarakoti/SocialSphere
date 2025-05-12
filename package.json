@@ -1,0 +1,22 @@
+{
+  "name": "socialsphere",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "npx hardhat run scripts/deploy-prediction.js --network nero_testnet && npx hardhat run scripts/deploy-nft.js --network nero_testnet && npx hardhat run scripts/deploy-vault.js --network nero_testnet",
+    "test": "npx hardhat test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@chainlink/contracts": "^1.4.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.24.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0",
+    "dotenv": "^16.5.0"
+  }
+}
